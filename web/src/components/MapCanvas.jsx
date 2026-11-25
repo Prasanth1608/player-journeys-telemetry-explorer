@@ -1,0 +1,41 @@
+import { useEffect, useRef } from "react";
+import { Renderer } from "../renderer/Renderer.js";
+import { useMapZoom } from "../hooks/useMapZoom.js";
+import { ZoomControls } from "./ui/ZoomControls.jsx";
+
+// Replay canvas: mounts the Replay renderer and hands it what to draw.
+// React only says WHAT to show; the Renderer handles HOW (and redraws on every clock tick).
+export function MapCanvas({ imageSrc, matches, layers, trailSeconds, clock, label, analysis = false }) {
+  const canvasRef = useRef(null);
+  const rendererRef = useRef(null);
+
+  // Create the renderer once, clean it up when the map area goes away
+  useEffect(() => {
+    const renderer = new Renderer(canvasRef.current);
+    rendererRef.current = renderer;
+    return () => renderer.destroy();
+  }, []);
+  const zoom = useMapZoom(rendererRef); // after the renderer exists
+
+  useEffect(() => {
+    rendererRef.current.setClock(clock);
+  }, [clock]);
+
+  useEffect(() => {
+    rendererRef.current.setImage(imageSrc);
+  }, [imageSrc]);
+
+  useEffect(() => {
+    rendererRef.current.setScene(matches, layers, trailSeconds, analysis);
+  }, [matches, layers, trailSeconds, analysis]);
+
+  return (
+    // map-area: the space available; map-wrap: the square map itself (canvas + overlays)
+    <div className="map-area">
+      <div className="map-wrap">
+        <canvas ref={canvasRef} className="map-canvas" role="img" aria-label={label} />
+        <ZoomControls {...zoom} />
+      </div>
+    </div>
+  );
+}

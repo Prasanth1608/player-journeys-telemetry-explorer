@@ -1,0 +1,460 @@
+/* Design tokens: every colour and size used by the app lives here. */
+/* Design tokens: every UI colour and size lives here.
+   Theme: "Cartographer × Studio". Dark is the default; light is set by
+   data-theme="light" on <html> (hooks/useTheme.js). The map itself and the
+   heatmap colours are the same in both themes. */
+:root {
+  --bg: #1c1c1f;
+  --panel: #26262a;
+  --panel-2: #2e2e33;
+  --line: #38383e;
+  --text: #ececee;
+  --muted: #b4b4bb;
+  --faint: #8a8a92;
+  --accent: #2f6fe4;          /* selection fills (white text on top) */
+  --accent-ink: #ffffff;
+  --accent-text: #79a8ff;     /* accent used as text/links: lighter for contrast */
+  --overlay: rgba(28, 28, 31, 0.92); /* tooltips and buttons over the map */
+  --selected-border: #ffffff;  /* ring around a switched-on layer toggle */
+  --radius: 10px;
+  --font: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --serif: "IBM Plex Serif", Georgia, serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  --bg: #f4f4f6;
+  --panel: #ffffff;
+  --panel-2: #ececf0;
+  --line: #dcdce1;
+  --text: #1c1c1f;
+  --muted: #4f4f57;
+  --faint: #6c6c74;
+  --accent: #2f6fe4;
+  --accent-ink: #ffffff;
+  --accent-text: #1f5bc9;
+  --overlay: rgba(255, 255, 255, 0.94);
+  --selected-border: #1c1c1f;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+}
+
+button, select { font: inherit; color: inherit; }
+button:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+/* ---------- Page ---------- */
+.app {
+  max-width: 1920px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.topbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+.brand { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.topbar-actions .segmented { min-width: 220px; }
+.topbar-actions .segmented button { padding: 8px 16px; font-weight: 500; }
+.topbar h1 { margin: 0; font-family: var(--serif); font-size: 24px; font-weight: 600; }
+.topbar-actions { display: flex; align-items: center; gap: 10px; }
+.theme-toggle {
+  width: 38px; height: 38px; border-radius: 8px; cursor: pointer; display: grid; place-items: center;
+  background: var(--panel); border: 1px solid var(--line); color: var(--text);
+}
+.theme-toggle svg { width: 18px; height: 18px; }
+.subtitle { color: var(--muted); }
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+@media (min-width: 1440px) {
+  .layout { grid-template-columns: 300px minmax(0, 1fr); }
+}
+@media (max-width: 820px) {
+  .layout { grid-template-columns: 1fr; }
+}
+
+
+/* ---------- Desktop and laptop layout refinements ----------
+   These rules apply only above the existing tablet/mobile breakpoint.
+   Tablet and mobile layout rules below 821px are intentionally unchanged. */
+@media (min-width: 821px) and (max-width: 1439px) {
+  .layout { grid-template-columns: minmax(250px, 290px) minmax(0, 1fr); }
+}
+@media (min-width: 1101px) and (max-width: 1439px) {
+  .stage-body { grid-template-columns: minmax(0, 1fr) minmax(270px, 290px); }
+  .side-panels { width: 100%; }
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+.filters, .match-list, .stage {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.filters { padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+.field-group { display: flex; flex-direction: column; gap: 8px; }
+.label-row { display: flex; justify-content: space-between; align-items: center; }
+.label {
+  font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--muted); font-weight: 600;
+}
+.link-button {
+  background: none; border: 0; padding: 0; cursor: pointer;
+  color: var(--accent-text); font-size: 12px;
+}
+
+.segmented {
+  display: flex; flex-wrap: wrap; gap: 3px; padding: 3px;
+  background: var(--panel-2); border-radius: 8px;
+}
+.segmented button {
+  flex: 1 1 auto; padding: 6px 10px; border: 0; border-radius: 6px;
+  background: transparent; color: var(--muted); cursor: pointer;
+}
+.segmented button:hover { color: var(--text); }
+.segmented button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  padding: 5px 12px; border-radius: 999px; cursor: pointer;
+  background: transparent; border: 1px solid var(--line); color: var(--muted);
+}
+.chip[aria-pressed="true"] { border-color: transparent; color: var(--accent-ink); background: var(--accent); }
+.chip[aria-pressed="true"] .chip-note { color: rgba(255, 255, 255, 0.8); }
+.chip-note { color: var(--faint); font-size: 12px; }
+
+/* ---------- Match list ---------- */
+.match-list { display: flex; flex-direction: column; min-height: 0; }
+.list-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 14px; border-bottom: 1px solid var(--line);
+}
+.sort select {
+  background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px;
+}
+
+.rows {
+  list-style: none; margin: 0; padding: 6px;
+  max-height: 60vh; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.row {
+  width: 100%; text-align: left; cursor: pointer;
+  background: transparent; border: 1px solid transparent; border-radius: 6px;
+  padding: 8px 10px; display: flex; flex-direction: column; gap: 4px;
+}
+.row:hover { background: var(--panel-2); }
+.row[aria-pressed="true"] { background: var(--panel-2); border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+.row-top { display: flex; justify-content: space-between; gap: 8px; }
+.row-id { font-family: var(--mono); font-size: 13px; }
+.row-meta { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.row-stats { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 12px; color: var(--muted); }
+.stat b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+.stat.zero { color: var(--faint); }
+.stat.zero b { color: var(--faint); }
+
+.selection-limit {
+  margin: 8px 12px 12px;
+  padding: 9px 11px;
+  border: 1px solid;
+  border-radius: 7px;
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 600;
+}
+.selection-limit--guidance {
+  color: #f2c45c;
+  background: rgba(217, 144, 25, 0.12);
+  border-color: rgba(217, 144, 25, 0.48);
+}
+.selection-limit--reached {
+  color: #ff7777;
+  background: rgba(210, 55, 55, 0.13);
+  border-color: rgba(220, 69, 69, 0.58);
+}
+:root[data-theme="light"] .selection-limit--guidance {
+  color: #855000;
+  background: #fff5d9;
+  border-color: #e4b64f;
+}
+:root[data-theme="light"] .selection-limit--reached {
+  color: #a51f1f;
+  background: #fff0f0;
+  border-color: #e28b8b;
+}
+
+/* ---------- Map area ---------- */
+.stage { padding: 12px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.stage-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.stage-head h2 { margin: 0; font-family: var(--serif); font-size: 18px; font-weight: 600; }
+.stage-meta { color: var(--muted); font-size: 13px; }
+
+.stage-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;   /* map, then the layer panel */
+  gap: 12px;
+  align-items: start;
+}
+@media (min-width: 1440px) {
+  .stage-body { grid-template-columns: minmax(0, 1fr) minmax(270px, 300px); gap: 12px; }
+}
+@media (max-width: 1100px) {
+  .stage-body { grid-template-columns: 1fr; }
+}
+
+.map-column { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+
+/* ---------- Timeline ---------- */
+.timeline {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px;
+  padding: 8px 10px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px;
+}
+.play {
+  width: 34px; height: 34px; flex: none; border-radius: 50%; cursor: pointer;
+  background: var(--accent); color: var(--accent-ink); border: 0; font-size: 13px;
+}
+.play:disabled { background: var(--line); color: var(--faint); cursor: default; }
+.track { position: relative; flex: 1 1 220px; min-width: 160px; display: flex; align-items: center; }
+.track input[type="range"] { width: 100%; accent-color: var(--accent); position: relative; }
+.ticks { position: absolute; left: 7px; right: 7px; top: 50%; height: 14px; transform: translateY(-50%); pointer-events: none; }
+.tick { position: absolute; top: 0; width: 2px; height: 100%; border-radius: 1px; opacity: 0.75; transform: translateX(-1px); }
+.clock { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 13px; min-width: 92px; }
+.mini-field select {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 4px 6px; font-size: 12px;
+}
+
+.map-canvas {
+  display: block; width: 100%; height: auto;
+  aspect-ratio: 1 / 1;               /* replaced by the image's own shape once it loads */
+  border-radius: 4px; background: var(--panel-2);
+  min-width: 0;
+}
+
+.side-panels { display: flex; flex-direction: column; gap: 14px; width: 290px; max-width: 100%; }
+@media (max-width: 1100px) { .side-panels { width: auto; } }
+@media (min-width: 1440px) { .side-panels { width: 100%; } }
+
+/* ---------- Heatmap panel ---------- */
+.heatmap-panel { display: flex; flex-direction: column; gap: 8px; }
+.link-group { display: inline-flex; gap: 12px; }
+.heat-grid .layer-toggle { width: 56px; justify-content: center; }
+.heat-grid .heat-choice { width: 66px; justify-content: center; gap: 5px; }
+.heat-grid .heat-choice[aria-pressed="true"] {
+  border-color: rgb(var(--heat-rgb)); color: var(--text); font-weight: 600; box-shadow: 0 0 0 1px rgb(var(--heat-rgb));
+  background: rgba(var(--heat-rgb), 0.16);
+}
+.heat-choice-dot { width: 8px; height: 8px; flex: none; border-radius: 50%; background: rgb(var(--heat-rgb)); opacity: 0.25; }
+.heat-choice[aria-pressed="true"] .heat-choice-dot { opacity: 1; }
+.heat-legend { display: flex; flex-direction: column; gap: 7px; margin-top: 4px; }
+.heat-legend-row { display: grid; grid-template-columns: minmax(105px, 1fr) minmax(90px, 1fr); align-items: center; gap: 8px; }
+.heat-legend-label { color: var(--muted); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.heat-gradient-wrap { display: flex; flex-direction: column; gap: 2px; }
+.heat-gradient { display: block; height: 9px; border-radius: 5px; border: 1px solid rgba(127, 127, 127, 0.35); }
+.heat-gradient-labels { display: flex; justify-content: space-between; color: var(--faint); font-size: 9px; line-height: 1.2; }
+.heat-note { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
+
+.map-wrap { position: relative; min-width: 0; }
+.heat-tooltip {
+  position: absolute; pointer-events: none; transform: translate(12px, -50%);
+  background: var(--overlay); color: var(--text); border: 1px solid var(--line); border-radius: 6px;
+  padding: 6px 8px; font-size: 12px; line-height: 1.5; white-space: nowrap; z-index: 2;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Match list: Heatmaps checkboxes ---------- */
+.list-actions {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 14px 0;
+}
+.row-item { display: flex; align-items: center; gap: 4px; }
+.row-item .row { flex: 1; min-width: 0; }
+.row-check { width: 16px; height: 16px; margin: 0 2px 0 6px; flex: none; accent-color: var(--accent); cursor: pointer; }
+
+/* ---------- Layer panel (doubles as the legend) ---------- */
+.layers { border-collapse: separate; border-spacing: 4px; align-self: start; }
+.layers th { text-align: left; }
+.layers thead th { text-align: center; padding-bottom: 2px; }
+.layer-group { font-weight: 500; color: var(--muted); font-size: 13px; padding-right: 6px; white-space: nowrap; }
+.layer-toggle {
+  display: inline-flex; align-items: center; gap: 6px; width: 72px;
+  padding: 5px 8px; border-radius: 6px; cursor: pointer;
+  background: transparent; border: 1px solid var(--line); color: var(--muted);
+}
+/* On: bright ring (border + 1px shadow, so nothing shifts). Off: grey and faded. */
+.layer-toggle[aria-pressed="true"] {
+  background: var(--panel-2); border-color: var(--selected-border); color: var(--text);
+  box-shadow: 0 0 0 1px var(--selected-border);
+}
+.layer-toggle[aria-pressed="false"] .layer-count { color: var(--faint); }
+.layer-toggle[aria-pressed="false"] .swatch { opacity: 0.35; }
+.layer-toggle[data-empty] .layer-count { opacity: 0.6; } /* nothing to draw: dim the number, keep the on/off ring visible */
+.layer-count { font-variant-numeric: tabular-nums; font-size: 12px; }
+.layer-none { display: inline-block; width: 72px; text-align: center; color: var(--faint); }
+.swatch { width: 20px; height: 20px; flex: none; }
+
+/* ---------- Empty / loading ---------- */
+.empty { padding: 28px 16px; text-align: center; }
+.empty-title { margin: 0 0 4px; font-weight: 600; }
+.empty-text { margin: 0; color: var(--muted); }
+
+/* ---------- Map zoom buttons ---------- */
+.zoom-controls {
+  position: absolute; top: 8px; right: 8px; z-index: 1;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.zoom-controls button {
+  width: 34px; height: 34px; border-radius: 6px; cursor: pointer;
+  background: var(--overlay); border: 1px solid var(--line); color: var(--text);
+  font-size: 18px; line-height: 1;
+}
+.zoom-controls .zoom-reset { font-size: 11px; font-variant-numeric: tabular-nums; }
+.zoom-controls button:hover:not(:disabled) { border-color: var(--faint); }
+.zoom-controls button:disabled { color: var(--faint); cursor: default; }
+
+/* ---------- Match search ---------- */
+.list-search { padding: 10px 14px 0; }
+.list-search input {
+  width: 100%; padding: 7px 10px; border-radius: 8px; font: inherit; font-family: var(--mono); font-size: 13px;
+  background: var(--panel-2); border: 1px solid transparent; color: var(--text);
+}
+.list-search input::placeholder { font-family: var(--font); color: var(--faint); }
+.list-search input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.layer-panel { display: flex; flex-direction: column; gap: 6px; }
+.heat-levels { display: flex; gap: 14px; font-size: 12px; color: var(--muted); }
+.heat-level { display: inline-flex; align-items: center; gap: 6px; }
+.heat-level-chip { width: 14px; height: 14px; border-radius: 4px; border: 1.5px solid; }
+
+/* ---------- Desktop: the whole app fits one screen ----------
+   No page scroll: the match list scrolls inside itself and ends on the same line as
+   the map panel; the map takes the largest square that fits, timeline always visible.
+   Narrow or very short windows keep the normal stacked, scrolling page. */
+@media (min-width: 821px) and (min-height: 560px) {
+  html, body, #root { height: 100%; min-height: 0; }
+  .app { height: 100dvh; overflow: hidden; }
+  .layout { flex: 1; min-height: 0; align-items: stretch; }
+
+  .sidebar { min-height: 0; }
+  .filters { flex: none; }
+  .match-list { flex: 1; min-height: 0; }
+  .rows { flex: 1; min-height: 0; max-height: none; }
+
+  .stage { min-height: 0; }
+  .stage-body { flex: 1; min-height: 0; align-items: stretch; }
+  .side-panels { align-self: start; }
+  .map-column { min-height: 0; }
+
+  /* Largest square that fits the free space (cq units = the map-area's own size) */
+  .map-area { flex: 1; min-height: 0; container-type: size; display: flex; justify-content: center; }
+  .map-area .map-wrap { width: min(100cqw, 100cqh); height: min(100cqw, 100cqh); }
+  .map-area .map-canvas { width: 100%; height: 100%; }
+}
+@media (min-width: 821px) and (max-width: 1100px) and (min-height: 560px) {
+  .stage-body { display: flex; flex-direction: column; } /* layers below the map; map shrinks to fit */
+  .map-column { flex: 1; } /* the map takes the space the layers leave */
+}
+
+
+/* Static multi-match Replay analysis replaces the animated timeline. */
+.analysis-timeline {
+  justify-content: center;
+  gap: 12px;
+  color: var(--muted, #9aa3ad);
+  font-size: 0.82rem;
+}
+.analysis-mode-label {
+  color: var(--text, #e8edf2);
+  font-weight: 650;
+}
+
+
+/* ---------- Heatmap metric buttons: prevent horizontal overflow ---------- */
+
+.layers {
+  width: 100%;
+  max-width: 100%;
+  table-layout: fixed;
+  border-spacing: 3px;
+}
+
+.layers th:first-child,
+.layers td:first-child {
+  width: 94px;
+}
+
+.layers th,
+.layers td {
+  min-width: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.layer-group {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.layers .layer-toggle {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: 5px 4px;
+  gap: 4px;
+  justify-content: center;
+}
+
+.layers .layer-count {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 11px;
+}
+
+.layers .layer-none {
+  width: 100%;
+}
+
+@media (max-width: 360px) {
+  .layers th:first-child,
+  .layers td:first-child {
+    width: 82px;
+  }
+
+  .layers .layer-toggle {
+    padding: 4px 2px;
+    gap: 3px;
+  }
+
+  .layers .layer-count {
+    font-size: 10px;
+  }
+
+  .layers .swatch {
+    width: 16px;
+    height: 16px;
+  }
+}
+
